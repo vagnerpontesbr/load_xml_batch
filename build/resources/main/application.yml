@@ -1,0 +1,28 @@
+spring:
+  batch:
+    job:
+      enabled: true
+    jdbc:
+      initialize-schema: always
+  datasource:
+    url: jdbc:h2:mem:batchdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  data:
+    mongodb:
+      uri: "mongodb+srv://dba:dba01@cluster0.qrmdk.mongodb.net/telecom_finance"
+
+load-batch:
+  input-dir: ${APP_PATH:.}/mock_invoices
+  threads: 24
+  chunk-size: 2000
+  writer-batch-size: 2000
+  unacknowledged-writes: true
+  failed-dir: ${APP_PATH:.}/failed_xml
+  error-log: ${APP_PATH:.}/failed_xml/skip_list.csv
+  summary-log: ${APP_PATH:.}/failed_xml/summary.csv
+
+logging:
+  level:
+    com.example.loadbatch: INFO
