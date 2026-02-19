@@ -73,7 +73,7 @@ APP_PATH=/Users/vagnerpontes/Documents/demos/load_xml_batch ./gradlew clean buil
    - `load-batch.failed-dir`: where failed XML files are moved
    - `load-batch.error-log`: CSV file for failed items
    - `load-batch.summary-log`: CSV summary file for batch results
-   - `spring.data.mongodb.uri`: MongoDB connection string
+   - `spring.data.mongodb.uri`: comes from `MONGO_URI` environment variable
 
 2. Ensure the input directory exists and contains `.xml` files.
 

@@ -28,7 +28,6 @@ CLIENTES = [
 ]
 
 DEFAULT_XML_COUNT = 30000
-DEFAULT_MONGODB_URI = "mongodb+srv://dba:dba01@cluster0.qrmdk.mongodb.net/telecom_finance"
 
 
 def _rand_date(days_back: int = 90):
@@ -141,12 +140,11 @@ if __name__ == "__main__":
         "--mongodb-uri",
         type=str,
         default=None,
-        help="MongoDB URI (default: MONGODB_URI env var, then internal fallback)",
+        help="MongoDB URI (default: MONGO_URI env var)",
     )
     args = parser.parse_args()
 
-    mongodb_uri = args.mongodb_uri or os.getenv("MONGODB_URI", DEFAULT_MONGODB_URI)
-    os.environ["MONGODB_URI"] = mongodb_uri
+    mongodb_uri = args.mongodb_uri or os.getenv("MONGO_URI")
 
     due_date = None
     if args.due_date:

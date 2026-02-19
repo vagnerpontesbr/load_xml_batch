@@ -11,7 +11,7 @@ spring:
     password: ""
   data:
     mongodb:
-      uri: ${MONGODB_URI:mongodb+srv://dba:dba01@cluster0.qrmdk.mongodb.net/telecom_finance}
+      uri: ${MONGO_URI}
 
 load-batch:
   input-dir: ${APP_PATH:.}/mock_invoices
