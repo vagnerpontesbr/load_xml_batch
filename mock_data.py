@@ -1,5 +1,6 @@
 import random
-from datetime import datetime, timedelta
+import os
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from xml.sax.saxutils import escape
 
@@ -27,11 +28,16 @@ CLIENTES = [
 ]
 
 DEFAULT_XML_COUNT = 30000
+DEFAULT_MONGODB_URI = "mongodb+srv://dba:dba01@cluster0.qrmdk.mongodb.net/telecom_finance"
 
 
 def _rand_date(days_back: int = 90):
-    dt = datetime.utcnow() - timedelta(days=random.randint(0, days_back))
+    dt = datetime.now(timezone.utc) - timedelta(days=random.randint(0, days_back))
     return dt
+
+
+def _iso_utc(dt: datetime) -> str:
+    return dt.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
 def _calc_tax(value: float, tipo: str, aliquota: float):
@@ -89,8 +95,8 @@ def generate_invoice(i: int, vencimento_fixado: datetime):
         "operadora": {"nome": operadora[0], "cnpj": operadora[1]},
         "cliente": {"razaoSocial": cliente_nome, "cnpj": cliente_cnpj},
         "contrato": {"numero": f"{random.randint(40000000, 49999999)}"},
-        "periodoReferencia": {"inicio": start.isoformat() + "Z", "fim": end.isoformat() + "Z"},
-        "datas": {"emissao": emissao.isoformat() + "Z", "vencimento": vencimento.isoformat() + "Z"},
+        "periodoReferencia": {"inicio": _iso_utc(start), "fim": _iso_utc(end)},
+        "datas": {"emissao": _iso_utc(emissao), "vencimento": _iso_utc(vencimento)},
         "moeda": "BRL",
         "itens": itens,
         "totais": {
@@ -101,8 +107,8 @@ def generate_invoice(i: int, vencimento_fixado: datetime):
         },
         "pagamento": {"metodo": "debito_automatico", "status": "em_aberto"},
         "auditoria": {
-            "criadoEm": emissao.isoformat() + "Z",
-            "atualizadoEm": emissao.isoformat() + "Z",
+            "criadoEm": _iso_utc(emissao),
+            "atualizadoEm": _iso_utc(emissao),
             "fonte": "mock_generator",
         },
     }
@@ -131,15 +137,24 @@ if __name__ == "__main__":
     )
     parser.add_argument("--due-date", type=str, default=None, help="Fixed due date (YYYY-MM-DD)")
     parser.add_argument("--output", type=str, default="mock_invoices", help="Output directory for XML files")
+    parser.add_argument(
+        "--mongodb-uri",
+        type=str,
+        default=None,
+        help="MongoDB URI (default: MONGODB_URI env var, then internal fallback)",
+    )
     args = parser.parse_args()
+
+    mongodb_uri = args.mongodb_uri or os.getenv("MONGODB_URI", DEFAULT_MONGODB_URI)
+    os.environ["MONGODB_URI"] = mongodb_uri
 
     due_date = None
     if args.due_date:
-        due_date = datetime.strptime(args.due_date, "%Y-%m-%d")
+        due_date = datetime.strptime(args.due_date, "%Y-%m-%d").replace(tzinfo=timezone.utc)
 
     if due_date is None:
-        now = datetime.utcnow()
-        due_date = datetime(now.year, 2, 1)
+        now = datetime.now(timezone.utc)
+        due_date = datetime(now.year, 2, 1, tzinfo=timezone.utc)
 
     out_dir = Path(args.output)
     out_dir.mkdir(parents=True, exist_ok=True)

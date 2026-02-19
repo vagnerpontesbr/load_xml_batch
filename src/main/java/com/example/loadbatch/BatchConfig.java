@@ -16,6 +16,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.core.ItemWriteListener;
+import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.MultiResourceItemReader;
@@ -197,6 +198,7 @@ public class BatchConfig {
             .reader(multiResourceItemReader())
             .processor(xmlToJsonProcessor())
             .writer(writer)
+            .listener((StepExecutionListener) metricsListener)
             .listener((ItemProcessListener<FilePayload, InvoiceRecord>) metricsListener)
             .listener((ItemWriteListener<InvoiceRecord>) metricsListener)
             .listener((ItemProcessListener<FilePayload, InvoiceRecord>) errorHandler)
@@ -209,10 +211,10 @@ public class BatchConfig {
     }
 
     @Bean
-    public Job importJob(JobRepository jobRepository, Step importStep) {
+    public Job importJob(JobRepository jobRepository, Step importStep, BatchSummaryListener batchSummaryListener) {
         return new JobBuilder("importJob", jobRepository)
             .start(importStep)
-            .listener(new BatchSummaryListener(errorLogPath.replace("skip_list.csv", "summary.csv")))
+            .listener(batchSummaryListener)
             .build();
     }
 
@@ -223,6 +225,8 @@ public class BatchConfig {
         executor.setMaxPoolSize(threads);
         executor.setQueueCapacity(threads * 4);
         executor.setThreadNamePrefix("batch-");
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setAwaitTerminationSeconds(30);
         executor.initialize();
         return executor;
     }

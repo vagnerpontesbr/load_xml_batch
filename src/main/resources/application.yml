@@ -11,17 +11,17 @@ spring:
     password: ""
   data:
     mongodb:
-      uri: "mongodb+srv://dba:dba01@cluster0.qrmdk.mongodb.net/telecom_finance"
+      uri: ${MONGODB_URI:mongodb+srv://dba:dba01@cluster0.qrmdk.mongodb.net/telecom_finance}
 
 load-batch:
   input-dir: ${APP_PATH:.}/mock_invoices
-  threads: 24
-  chunk-size: 2000
-  writer-batch-size: 2000
+  threads: 16
+  chunk-size: 4000
+  writer-batch-size: 8000
   unacknowledged-writes: true
   failed-dir: ${APP_PATH:.}/failed_xml
   error-log: ${APP_PATH:.}/failed_xml/skip_list.csv
-  summary-log: ${APP_PATH:.}/failed_xml/summary.csv
+  summary-log: ${APP_PATH:.}/summary.csv
 
 logging:
   level:

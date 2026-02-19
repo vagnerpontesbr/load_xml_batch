@@ -52,23 +52,23 @@ public class BatchMetricsListener implements StepExecutionListener, ItemProcessL
 
     @Override
     public ExitStatus afterStep(StepExecution stepExecution) {
-        long pCount = processCount.sum();
-        long wCount = writeCount.sum();
+        long xmlQuantity = processCount.sum();
+        long ingestQuantity = writeCount.sum();
 
-        long pAvg = pCount > 0 ? processTotalMs.sum() / pCount : 0;
-        long pMin = pCount > 0 ? processMinMs.get() : 0;
-        long pMax = processMaxMs.get();
+        long xmlAvg = xmlQuantity > 0 ? processTotalMs.sum() / xmlQuantity : 0;
+        long xmlMin = xmlQuantity > 0 ? processMinMs.get() : 0;
+        long xmlMax = processMaxMs.get();
 
-        long wAvg = wCount > 0 ? writeTotalMs.sum() / wCount : 0;
-        long wMin = wCount > 0 ? writeMinMs.get() : 0;
-        long wMax = writeMaxMs.get();
+        long ingestAvg = ingestQuantity > 0 ? writeTotalMs.sum() / ingestQuantity : 0;
+        long ingestMin = ingestQuantity > 0 ? writeMinMs.get() : 0;
+        long ingestMax = writeMaxMs.get();
 
         logger.info("Step completed. processed={} written={} failed={}",
                 processed.sum(), written.sum(), failed.sum());
-        logger.info("  XML->JSON : min={}ms  avg={}ms  max={}ms  (n={})",
-                pMin, pAvg, pMax, pCount);
-        logger.info("  Insert    : min={}ms  avg={}ms  max={}ms  (n={})",
-                wMin, wAvg, wMax, wCount);
+        logger.info("XML conversion metrics: quantity={} min={}ms avg={}ms max={}ms",
+                xmlQuantity, xmlMin, xmlAvg, xmlMax);
+        logger.info("Ingestion metrics: quantity={} min={}ms avg={}ms max={}ms",
+                ingestQuantity, ingestMin, ingestAvg, ingestMax);
 
         return stepExecution.getExitStatus();
     }

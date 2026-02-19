@@ -12,14 +12,32 @@ Install dependencies to run both `mock_data.py` (mock XML generation) and `load_
 
 ```bash
 sudo apt update
-sudo apt install -y python3 python3-venv python3-pip openjdk-17-jdk ca-certificates
+sudo apt install -y python3 python3-venv python3-pip curl zip unzip ca-certificates
 ```
 
 Check versions:
 
 ```bash
 python3 --version
+```
+
+## OpenJDK 23 on Azure Ubuntu
+On Azure Ubuntu, `openjdk-23-jdk` is usually not available via `apt`. Install Java 23 with SDKMAN:
+
+```bash
+curl -s "https://get.sdkman.io" | bash
+source "$HOME/.sdkman/bin/sdkman-init.sh"
+
+sdk list java | grep -E "23.*(tem|open|oracle|zulu)" | head -n 20
+sdk install java 23-tem
 java -version
+```
+
+Persist SDKMAN for new shells:
+
+```bash
+echo 'source "$HOME/.sdkman/bin/sdkman-init.sh"' >> ~/.bashrc
+source ~/.bashrc
 ```
 
 ## Gradle Wrapper Setup (gradlew)

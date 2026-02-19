@@ -10,12 +10,12 @@ import org.springframework.beans.factory.annotation.Value;
 @EnableMongoRepositories
 public class LoadBatchApplication {
     public static void main(String[] args) {
-        SpringApplication.run(LoadBatchApplication.class, args);
+        System.exit(SpringApplication.exit(SpringApplication.run(LoadBatchApplication.class, args)));
     }
 
     @Bean
     public BatchSummaryListener batchSummaryListener(
-            @Value("${load-batch.summary-log:${APP_PATH:.}/failed_xml/summary.csv}") String path) {
+            @Value("${load-batch.summary-log:${APP_PATH:.}/summary.csv}") String path) {
         return new BatchSummaryListener(path);
     }
 }
