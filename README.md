@@ -21,6 +21,15 @@ Check versions:
 python3 --version
 ```
 
+## Download From GitHub With wget
+If you want to download this repository without `git`, use:
+
+```bash
+wget -O load_xml_batch.zip https://github.com/vagnerpontesbr/load_xml_batch/archive/refs/heads/main.zip
+unzip load_xml_batch.zip
+cd load_xml_batch-main
+```
+
 ## OpenJDK 23 on Azure Ubuntu
 On Azure Ubuntu, `openjdk-23-jdk` is usually not available via `apt`. Install Java 23 with SDKMAN:
 
